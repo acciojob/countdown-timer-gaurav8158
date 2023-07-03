@@ -1,51 +1,73 @@
-// Get the necessary HTML elements
-const durationInput = document.getElementById('userInput');
-const startButton = document.getElementById('myButton');
-const remainingTime = document.getElementById('countDown');
-const lastTime = document.getElementById('endTime');
+const userInput = document.getElementById('userInput');
+const startButton = document.querySelector('.timer button');
+const countDownText = document.getElementById('countDown');
+const endTimeText = document.getElementById('endTime');
 
-// Function to start the countdown timer
-function startCountdown(duration) {
-  const startTime = new Date().getTime();
-  const endTime = new Date(startTime + duration * 60000); // Convert duration to milliseconds
+// Add event listener to the start button
+startButton.addEventListener('click', startCountdown);
 
-  console.log("startTime" ,startTime,"endTime",endTime);
-  // Update the remaining time every second
-  const intervalID = setInterval(updateTime, 1000);
+// Function to start the countdown
+function startCountdown() {
+  // Disable user input and start button during the countdown
+  userInput.disabled = true;
+  startButton.disabled = true;
 
-  // Function to update the remaining time
-  function updateTime() {
-    const currentTime = new Date().getTime();
-    const remaining = endTime - currentTime;
-console.log("currentTime", currentTime ,"remaining" ,remaining )
-    if (remaining > 0) {
-      const minutes = Math.floor((remaining / 60000) % 60);
-      const seconds = Math.floor((remaining / 1000) % 60);
+  // Get the duration from the user input
+  const duration = userInput.value * 60; // Convert minutes to seconds
 
-      remainingTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    } else {
-      remainingTime.textContent = '00:00';
-      const hour1 =(new Date()).getHours();
-      const minutes1 =(new Date()).getMinutes();
-      const seconds1 = (new Date()).getSeconds();
-      lastTime.textContent =`${hour1}:${minutes1}:${seconds1}`;
-      clearInterval(intervalID);
+  // Calculate the end time
+  const endTime = new Date(Date.now() + duration * 1000);
+
+  // Update the end time text
+  endTimeText.textContent = `End Time: ${formatClockTime(endTime)}`;
+
+  // Update the countdown every second
+  const countdownInterval = setInterval(updateCountdown, 1000);
+
+  // Function to update the countdown
+  function updateCountdown() {
+    // Calculate the remaining time
+    const currentTime = Date.now();
+    const remainingTime = Math.round((endTime - currentTime) / 1000);
+
+    // Check if the countdown has ended
+    if (remainingTime < 0) {
+      // Clear the countdown interval
+      clearInterval(countdownInterval);
+
+      // Update the countdown text and enable user input and start button
+      countDownText.textContent = 'Countdown Ended';
+      userInput.disabled = false;
+      startButton.disabled = false;
+
+      return;
     }
-  }
 
-  // Display the end time
-  const endHours = endTime.getHours().toString().padStart(2, '0');
-  const endMinutes = endTime.getMinutes().toString().padStart(2, '0');
-  endTime.textContent = `${endHours}:${endMinutes}`;
+    // Update the countdown text
+    countDownText.textContent = `Remaining Time: ${formatTime(remainingTime)}`;
+  }
 }
 
-// Event listener for the start button
-startButton.addEventListener('click', function() {
-  const duration = parseInt(durationInput.value);
-  if (!isNaN(duration)) {
-    startCountdown(duration);
-  }
-});
+// Function to format time (hh:mm:ss)
+function formatTime(time) {
+  const hours = Math.floor(time / 3600);
+  const minutes = Math.floor((time % 3600) / 60);
+  const seconds = time % 60;
 
-// Timer for the default options
- // startCountdown(10); // 10 minutes countdown
+  return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+}
+
+// Function to format clock time (hh:mm AM/PM)
+function formatClockTime(time) {
+  const hours = time.getHours();
+  const minutes = time.getMinutes();
+  const amPm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12;
+
+  return `${formattedHours}:${padZero(minutes)} ${amPm}`;
+}
+
+// Function to pad zeros to single-digit numbers
+function padZero(num) {
+  return num.toString().padStart(2, '0');
+}
