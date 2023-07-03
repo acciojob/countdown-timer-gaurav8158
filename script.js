@@ -19,7 +19,7 @@ function startCountdown() {
   const endTime = new Date(Date.now() + duration * 1000);
 
   // Update the end time text
-  endTimeText.textContent = `End Time: ${formatClockTime(endTime)}`;
+  // endTimeText.textContent = `End Time: ${formatClockTime(endTime)}`;
 
   // Update the countdown every second
   const countdownInterval = setInterval(updateCountdown, 1000);
@@ -33,6 +33,11 @@ function startCountdown() {
     // Check if the countdown has ended
     if (remainingTime < 0) {
       // Clear the countdown interval
+		  // Calculate the end time
+  const endTimes = new Date(Date.now() + duration * 1000);
+
+  // Update the end time text
+  endTimeText.textContent = `End Time: ${formatClockTime(endTimes)}`;
       clearInterval(countdownInterval);
 
       // Update the countdown text and enable user input and start button
